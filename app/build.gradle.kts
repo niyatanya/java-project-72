@@ -2,6 +2,8 @@ plugins {
     id("java")
     application
     checkstyle
+    jacoco
+    id("io.freefair.lombok") version "8.6"
 }
 
 application { mainClass.set("hexlet.code.App") }
@@ -20,4 +22,11 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = true
+    }
 }
