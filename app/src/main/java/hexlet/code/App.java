@@ -7,7 +7,7 @@ public class App {
         app.start(7070);
     }
 
-    public static Javalin getApp(){
+    public static Javalin getApp() {
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
         });
