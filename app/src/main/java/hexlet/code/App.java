@@ -4,7 +4,7 @@ import io.javalin.Javalin;
 public class App {
     public static void main(String[] args) {
         var app = getApp();
-        app.start(7070);
+        app.start(getPort());
     }
 
     public static Javalin getApp() {
@@ -13,5 +13,10 @@ public class App {
         });
         app.get("/", ctx -> ctx.result("Hello World"));
         return app;
+    }
+
+    private static int getPort() {
+        String port = System.getenv().getOrDefault("PORT", "7070");
+        return Integer.valueOf(port);
     }
 }
