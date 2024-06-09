@@ -4,31 +4,34 @@ import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import hexlet.code.repository.BaseRepository;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class App {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
         app.start(getPort());
     }
 
-    public static Javalin getApp() throws SQLException {
+    public static Javalin getApp() throws SQLException, IOException {
         // Создаем базу данных
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDataBaseUrl());
         HikariDataSource dataSource = new HikariDataSource(hikariConfig);
 
-        // Получаем путь до файла в src/main/resources
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        String sql = new BufferedReader(new InputStreamReader(url))
-                .lines().collect(Collectors.joining("\n"));
+        String sql = readResourceFile("schema.sql");
 
+        log.info(sql);
         // Получаем соединение, создаем стейтмент и выполняем запрос
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
@@ -54,5 +57,13 @@ public class App {
 
     private static String getDataBaseUrl() {
         return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+    }
+
+    private static String readResourceFile(String fileName) throws IOException {
+        var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
+
     }
 }
