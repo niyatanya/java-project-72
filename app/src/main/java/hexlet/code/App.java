@@ -54,15 +54,11 @@ public class App {
         });
 
         app.get(NamedRoutes.rootPath(), RootController::index);
-        app.post(NamedRoutes.urlsPath(), UrlsController::build);
+        app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         return app;
     }
-
-    //пройтись линтером
-    //залить на гитхаб, пройти проверки
-    //задеплоить
 
     private static int getPort() {
         String port = System.getenv().getOrDefault("PORT", "7070");

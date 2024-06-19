@@ -18,7 +18,7 @@ import java.net.URI;
 import java.net.URL;
 
 public class UrlsController {
-    public static void build(Context ctx) throws SQLException {
+    public static void create(Context ctx) throws SQLException {
         String urlString = ctx.formParam("url").toLowerCase().trim();
 
         // Если введен корректный URL, нормализуем его
