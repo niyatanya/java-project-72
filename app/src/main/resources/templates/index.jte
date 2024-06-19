@@ -1,4 +1,8 @@
+@import hexlet.code.dto.BasePage
+@param BasePage page
+
 @template.layout.page(
+page = page,
 content = @`
     <section>
         <div class="container-fluid bg-dark p-5">
