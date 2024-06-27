@@ -1,4 +1,5 @@
 @import hexlet.code.dto.UrlsPage
+@import java.time.format.DateTimeFormatter
 @param UrlsPage page
 
 @template.layout.page(
@@ -29,10 +30,15 @@ content = @`
                             <a href="/urls/${url.getId()}">${url.getName()}</a>
                         </td>
                         <td>
-
+                            @if(url.getUrlChecks() != null && !url.getUrlChecks().isEmpty())
+                            ${url.getUrlChecks().getFirst().getCreatedAt()
+                            .toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm"))}
+                            @endif
                         </td>
                         <td>
-
+                            @if(url.getUrlChecks() != null && !url.getUrlChecks().isEmpty())
+                            ${String.valueOf(url.getUrlChecks().getFirst().getStatusCode())}
+                            @endif
                         </td>
                     </tr>
                 @endfor

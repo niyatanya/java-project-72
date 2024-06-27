@@ -3,6 +3,7 @@
 @param UrlPage page
 
 @template.layout.page(
+page = page,
 content = @`
     <main class="flex-grow-1">
 
@@ -30,7 +31,7 @@ content = @`
                 </table>
 
                 <h2 class="mt-5">Проверки</h2>
-                <form method="post" action="/urls/1/checks">
+                <form method="post" action="/urls/${page.getUrl().getId()}/checks">
                     <button type="submit" class="btn btn-primary">Запустить проверку</button>
                 </form>
 
@@ -44,7 +45,31 @@ content = @`
                         <th class="col-2">Дата проверки</th>
                     </tr></thead>
                     <tbody>
-
+                    @if(page.getUrl().getUrlChecks() != null)
+                    @for(var urlCheck : page.getUrl().getUrlChecks())
+                        <tr>
+                            <td>
+                                ${urlCheck.getId()}
+                            </td>
+                            <td>
+                                ${urlCheck.getStatusCode()}
+                            </td>
+                            <td>
+                                ${urlCheck.getTitle()}
+                            </td>
+                            <td>
+                                ${urlCheck.getH1()}
+                            </td>
+                            <td>
+                                ${urlCheck.getDescription()}
+                            </td>
+                            <td>
+                                ${urlCheck.getCreatedAt()
+                                    .toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm"))}
+                            </td>
+                        </tr>
+                    @endfor
+                    @endif
                     </tbody>
                 </table>
             </div>
