@@ -110,48 +110,39 @@ public class AppTest {
 
     @Test
     public void testCheckUrl() throws SQLException {
-        // Предполагаю следующую работу теста
+        // Описание работы теста:
         // 1. В @BeforeAll создаю мок-сервер и передаю туда один мок-ответ (mockResponse).
         // Ответ состоит из кода состояния 200 и body - HTML-страницы, которая сохранена в фикстурах.
         // 2. Тест вместо обращения к реальной странице должен достать мок-ответ из мок-сервера.
         // 3. Для этого создается мок-URL mockUrlName. На основе него создается инстанс Url.
         // С этим инстансом в реальную программу передается mockUrlName, при обращении к которому запрос должен
         // уходить на mockWebServer и получить оттуда мок-респонс (mockResponse).
-        //
-        // Что не работает:
-        // 1. Если в mockUrlName поставить url("/"), тесты падают с java.nio.channels.ClosedChannelException.
-        // Если в mockUrlName поставить url("https://ru.hexlet.io"), программа реально идет на этот сайт.
-        // Я сужу об этом, так как, судя по успеху теста, response.body().string()) содержит title с сайта Хекслета.
-        // Какой адрес указывается в url("?")?
-        // Что возвращает mockWebServer.url("?").toString()? Как метод избавляет от посещения реальной страницы?
-        // 2. Не проходят проверки на содержание в мок-овете данных title, h1 и description из TEST_HTML_PAGE.
-        //
 
-        // К пункту 1.
-        String mockUrlName = mockWebServer.url("https://ru.hexlet.io").toString();
-        Url mockUrl = new Url(mockUrlName);
-        UrlRepository.save(mockUrl);
-
+        // Внутри теста создаем мок-УРЛ, запускаем его проверку программой и считываем сохраненный мок-результат
         JavalinTest.test(app, (server, client) -> {
+            String mockUrlName = mockWebServer.url("/").toString();
+            Url mockUrl = new Url(mockUrlName);
+            UrlRepository.save(mockUrl);
             var response = client.post(NamedRoutes.checkUrlPath(String.valueOf(mockUrl.getId())));
 
+            // Проверка на положительный ответ сервера по адресу NamedRoutes.checkUrlPath(id)
             assertThat(response.code()).isEqualTo(200);
-            // К пункту 1. Этот ассерт проходит успешно, хотя не должен.
-            assertThat(response.body().string()).contains("Хекслет — онлайн-школа программирования,"
-                    + " онлайн-обучение ИТ-профессиям");
 
-          // К пункту 2. Проверочные данные с мок-body из фикстуры, не работает
-          //  assertThat(response.body().string()).contains("HTML test page");
-          //  assertThat(response.body().string()).contains("The best test page for all possible scenarios");
-          //  assertThat(response.body().string()).contains("Discover this test HTML page tailored for web applications"
-          //     + " testing. Featuring headers, paragraphs, title and meta data, ideal for evaluating functionality.");
+            // Сохраняем бади ответа в переменную. Важно это сделать один раз, а не каждый раз для отдельного ассерта
+            String responseBody = response.body().string();
+
+            // Проверяем, что вернувшееся от сервера бади содержит данные из фикстуры
+            assertThat(responseBody).contains("HTML test page");
+            assertThat(responseBody).contains("The best test page for all possible scenarios");
+            assertThat(responseBody).contains("Discover this test HTML page tailored for web applications"
+               + " testing. Featuring headers, paragraphs, title and meta data, ideal for evaluating functionality.");
 
             List<UrlCheck> urlChecks = UrlChecksRepository.getEntities(mockUrl.getId());
 
-            // Это работает верно
+            // Проверяем, что в таблице с проверками появилась одна запись
             assertThat(urlChecks.size()).isEqualTo(1);
 
-            // Это работает верно
+            // Проверяем, что сохраненная проверка имеет ожидаемые айди, код ответа и дату
             UrlCheck lastUrlCheck = UrlChecksRepository.getEntities(mockUrl.getId()).getFirst();
             int urlId = lastUrlCheck.getUrlId();
             int statusCode = lastUrlCheck.getStatusCode();
@@ -159,11 +150,14 @@ public class AppTest {
             assertThat(statusCode).isEqualTo(200);
             assertThat(lastUrlCheck.getCreatedAt()).isToday();
 
-            // К пункту 1. Эти ассерты проходят успешно, хотя не должны. Тут должны быть данные из TEST_HTML_PAGE.
+            // Проверяем, что сохраненная проверка имеет ожидаемые данные из TEST_HTML_PAGE
             String title = lastUrlCheck.getTitle();
-            assertThat(title).contains("Хекслет — онлайн-школа программирования, онлайн-обучение ИТ-профессиям");
+            assertThat(title).contains("HTML test page");
             String h1 = lastUrlCheck.getH1();
-            assertThat(h1).contains("Лучшая школа программирования по мнению разработчиков");
+            assertThat(h1).contains("The best test page for all possible scenarios");
+            String description = lastUrlCheck.getDescription();
+            assertThat(description).contains("Discover this test HTML page tailored for web applications"
+                 + " testing. Featuring headers, paragraphs, title and meta data, ideal for evaluating functionality.");
         });
     }
 }
