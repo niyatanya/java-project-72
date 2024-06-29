@@ -135,7 +135,7 @@ public class AppTest {
             assertThat(responseBody).contains("HTML test page");
             assertThat(responseBody).contains("The best test page for all possible scenarios");
             assertThat(responseBody).contains("Discover this test HTML page tailored for web applications"
-               + " testing. Featuring headers, paragraphs, title and meta data, ideal for evaluating functionality.");
+                + " testing. Featuring headers, paragraphs, title and meta data, ideal for evaluating functionality.");
 
             List<UrlCheck> urlChecks = UrlChecksRepository.getEntities(mockUrl.getId());
 
