@@ -60,6 +60,29 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
+    public static List<UrlCheck> getEntities() throws SQLException {
+        String sql = "SELECT * FROM url_checks ORDER BY id DESC";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+
+            List<UrlCheck> result = new ArrayList<>();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int urlId = resultSet.getInt("url_id");
+                int statusCode = resultSet.getInt("status_code");
+                Timestamp createdAt = resultSet.getTimestamp("created_at");
+                String title = resultSet.getString("title");
+                String h1 = resultSet.getString("h1");
+                String description = resultSet.getString("description");
+
+                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
+                result.add(urlCheck);
+            }
+            return result;
+        }
+    }
+
     public static Optional<UrlCheck> find(int id) throws SQLException {
         String sql = "SELECT * FROM url_checks WHERE id = ?";
         try (var conn = dataSource.getConnection();

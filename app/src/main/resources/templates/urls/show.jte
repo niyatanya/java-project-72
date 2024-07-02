@@ -45,8 +45,8 @@ content = @`
                         <th class="col-2">Дата проверки</th>
                     </tr></thead>
                     <tbody>
-                    @if(page.getUrl().getUrlChecks() != null)
-                    @for(var urlCheck : page.getUrl().getUrlChecks())
+                    @if(page.getUrlChecks() != null)
+                    @for(var urlCheck : page.getUrlChecks())
                         <tr>
                             <td>
                                 ${urlCheck.getId()}

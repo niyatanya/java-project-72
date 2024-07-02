@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlCheck;
 
 public class UrlRepository extends BaseRepository {
 
@@ -22,13 +21,11 @@ public class UrlRepository extends BaseRepository {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 Timestamp createdAt = resultSet.getTimestamp("created_at");
-                List<UrlCheck> urlChecks = UrlChecksRepository.getEntities(id);
 
                 Url url = new Url(name);
 
                 url.setId(id);
                 url.setCreatedAt(createdAt);
-                url.setUrlChecks(urlChecks);
 
                 result.add(url);
             }
