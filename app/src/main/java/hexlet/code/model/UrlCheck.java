@@ -3,7 +3,9 @@ package hexlet.code.model;
 import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Getter
 @Setter
 public final class UrlCheck {
@@ -18,18 +20,5 @@ public final class UrlCheck {
     public UrlCheck(int urlId, int statusCode) {
         this.statusCode = statusCode;
         this.urlId = urlId;
-    }
-
-    @Override
-    public String toString() {
-        return "UrlCheck{"
-                + "id=" + id
-                + ", statusCode=" + statusCode
-                + ", title='" + title + '\''
-                + ", h1='" + h1 + '\''
-                + ", description='" + description + '\''
-                + ", urlId=" + urlId
-                + ", createdAt=" + createdAt
-                + '}';
     }
 }

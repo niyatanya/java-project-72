@@ -22,30 +22,24 @@ public class App {
     }
 
     public static Javalin getApp() throws SQLException, IOException {
-        // Создаем базу данных
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(Utils.getDataBaseUrl());
         HikariDataSource dataSource = new HikariDataSource(hikariConfig);
 
-        // Добавляем в БД таблицы со следующей структурой
         String sql = Utils.readResourceFile("schema.sql");
 
-        // Получаем соединение, создаем стейтмент и выполняем запрос
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
         }
 
-        // Привязываем созданную базу данных к репозиторию
         BaseRepository.dataSource = dataSource;
 
-        // Создаем приложение и настраиваем его, чтобы работали логи и генерировались шаблоны
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
             config.fileRenderer(new JavalinJte(Utils.createTemplateEngine()));
         });
 
-        // Прописываем обработчики
         app.get(NamedRoutes.rootPath(), RootController::index);
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlsPath(), UrlsController::index);

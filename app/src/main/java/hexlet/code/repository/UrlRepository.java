@@ -61,8 +61,6 @@ public class UrlRepository extends BaseRepository {
             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
             url.setCreatedAt(createdAt);
             stmt.setTimestamp(2, createdAt);
-
-            System.out.println("--> Распечатываю sql-запрос: " + stmt);
             stmt.executeUpdate();
 
             var generatedKeys = stmt.getGeneratedKeys();
@@ -71,7 +69,6 @@ public class UrlRepository extends BaseRepository {
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }
-            System.out.println("--> Проверяю наличие нового url в базе: " + find(url.getId()).orElseThrow());
         }
     }
 

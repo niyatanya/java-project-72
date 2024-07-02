@@ -26,8 +26,6 @@ public class UrlChecksRepository extends BaseRepository {
             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
             urlCheck.setCreatedAt(createdAt);
             stmt.setTimestamp(6, createdAt);
-
-            System.out.println("Print statement: " + stmt);
             stmt.executeUpdate();
 
             var generatedKeys = stmt.getGeneratedKeys();
@@ -36,7 +34,6 @@ public class UrlChecksRepository extends BaseRepository {
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }
-            System.out.println("Распечатываю сохраненную проверку из базы: " + find(urlCheck.getId()));
         }
     }
 
@@ -56,17 +53,9 @@ public class UrlChecksRepository extends BaseRepository {
                 String h1 = resultSet.getString("h1");
                 String description = resultSet.getString("description");
 
-                UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
-
-                urlCheck.setId(id);
-                urlCheck.setCreatedAt(createdAt);
-                urlCheck.setTitle(title);
-                urlCheck.setH1(h1);
-                urlCheck.setDescription(description);
-
+                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
                 result.add(urlCheck);
             }
-            System.out.println("Распечатать все проверки: " + result);
             return result;
         }
     }
@@ -86,14 +75,7 @@ public class UrlChecksRepository extends BaseRepository {
                 String h1 = resultSet.getString("h1");
                 String description = resultSet.getString("description");
 
-                UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
-
-                urlCheck.setId(id);
-                urlCheck.setCreatedAt(createdAt);
-                urlCheck.setTitle(title);
-                urlCheck.setH1(h1);
-                urlCheck.setDescription(description);
-
+                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
                 return Optional.of(urlCheck);
             }
         }

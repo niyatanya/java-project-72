@@ -26,34 +26,26 @@ import java.util.List;
 
 public class UrlsController {
     public static void create(Context ctx) throws SQLException {
-        // Получаем адрес сайта для проверки из формы
         String urlString = ctx.formParam("url").toLowerCase().trim();
 
-        // Проверяем адрес на корректность и нормализуем его
         String normalizedUrlString;
         try {
-            // Если URL введен корректно, нормализуем его
             normalizedUrlString = Utils.normalizeUrlString(urlString);
         } catch (MalformedURLException | IllegalArgumentException | URISyntaxException e) {
-            // Если URL введен некорректно, программа перенаправит на / и выдаст флеш-сообщение
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("alertType", "danger");
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
 
-        // Если такого URL еще нет, добавляем его в базу
         if (!UrlRepository.urlExists(normalizedUrlString)) {
-            System.out.println("--> Проверка наличия сайта в базе. Сайт в базе не обнаружен.");
             Url url = new Url(normalizedUrlString);
             UrlRepository.save(url);
 
-            // Перенаправляем на страницу со всеми сайтами, добавленными в базу, и выводим флеш-сообщение
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.sessionAttribute("alertType", "success");
             ctx.redirect(NamedRoutes.urlsPath());
         } else {
-            // Если URL уже есть в базе, выдается флеш-сообщение
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("alertType", "danger");
             ctx.redirect(NamedRoutes.urlsPath());
@@ -75,8 +67,6 @@ public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         List<Url> urls = UrlRepository.getEntities();
         UrlsPage page = new UrlsPage(urls);
-        System.out.println("--> Распечатываю все сайты из базы: " + urls);
-        System.out.println("--> Кол-во строк в базе: " + urls.size());
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         page.setAlertType(ctx.consumeSessionAttribute("alertType"));
         ctx.render("urls/index.jte", model("page", page));
@@ -88,20 +78,15 @@ public class UrlsController {
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
 
         try {
-            // Отправляем запрос к проверяемому сайту и получаем ответ от него (статус и текст страницы)
             HttpResponse<String> response = Unirest.get(url.getName()).asString();
             int statusCode = response.getStatus();
             String responseHTMLBody = response.getBody();
             Unirest.shutDown();
 
-            // Создаем инстанс проверки по айди сайта и статус-коду
             UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
 
-            // Парсим текст ответа, чтобы достать заголовок и пр.
             Document document = Jsoup.parse(responseHTMLBody);
 
-            // Согласно ТЗ, сначала нужно проверить наличие тегов на странице.
-            // Затем, если они есть, то записывать их содержимое в базу.
             String title = document.title();
             if (!title.equals("")) {
                 urlCheck.setTitle(title);
@@ -118,8 +103,6 @@ public class UrlsController {
                 String contentText = content.attr("content");
                 urlCheck.setDescription(contentText);
             }
-            System.out.println("URL check info: " + urlCheck);
-            // Сохраняем проверку со всеми полученными полями в базу
             UrlChecksRepository.save(urlCheck);
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");
