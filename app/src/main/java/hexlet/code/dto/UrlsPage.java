@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UrlsPage extends BasePage {
+public final class UrlsPage extends BasePage {
     private List<Url> urls;
     private List<UrlCheck> urlChecks;
 
