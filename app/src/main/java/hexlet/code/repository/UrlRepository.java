@@ -1,5 +1,6 @@
 package hexlet.code.repository;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -18,11 +19,7 @@ public class UrlRepository extends BaseRepository {
 
             List<Url> result = new ArrayList<>();
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                Timestamp createdAt = resultSet.getTimestamp("created_at");
-                Url url = new Url(id, name, createdAt);
-                result.add(url);
+                result.add(getUrlFromResultSet(resultSet));
             }
             return result;
         }
@@ -47,9 +44,7 @@ public class UrlRepository extends BaseRepository {
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql,
                      Statement.RETURN_GENERATED_KEYS)) {
-
             stmt.setString(1, url.getName());
-
             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
             url.setCreatedAt(createdAt);
             stmt.setTimestamp(2, createdAt);
@@ -72,12 +67,16 @@ public class UrlRepository extends BaseRepository {
 
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
-                String name = resultSet.getString("name");
-                Timestamp createdAt = resultSet.getTimestamp("created_at");
-                Url url = new Url(id, name, createdAt);
-                return Optional.of(url);
+                return Optional.of(getUrlFromResultSet(resultSet));
             }
         }
         return Optional.empty();
+    }
+
+    public static Url getUrlFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("id");
+        String name = resultSet.getString("name");
+        Timestamp createdAt = resultSet.getTimestamp("created_at");
+        return new Url(id, name, createdAt);
     }
 }
