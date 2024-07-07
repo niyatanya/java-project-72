@@ -1,5 +1,6 @@
 package hexlet.code.repository;
 
+import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
 import java.sql.ResultSet;
@@ -7,8 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 public class UrlChecksRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
@@ -53,34 +55,6 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
-    public static List<UrlCheck> getAllChecks() throws SQLException {
-        String sql = "SELECT * FROM url_checks ORDER BY id DESC";
-        try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            var resultSet = stmt.executeQuery();
-
-            List<UrlCheck> result = new ArrayList<>();
-            while (resultSet.next()) {
-                result.add(getUrlCheckFromResultSet(resultSet));
-            }
-            return result;
-        }
-    }
-
-    public static Optional<UrlCheck> find(int id) throws SQLException {
-        String sql = "SELECT * FROM url_checks WHERE id = ?";
-        try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            var resultSet = stmt.executeQuery();
-
-            if (resultSet.next()) {
-                return Optional.of(getUrlCheckFromResultSet(resultSet));
-            }
-        }
-        return Optional.empty();
-    }
-
     public static UrlCheck getUrlCheckFromResultSet(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         int urlId = resultSet.getInt("url_id");
@@ -91,5 +65,17 @@ public class UrlChecksRepository extends BaseRepository {
         String description = resultSet.getString("description");
 
         return new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
+    }
+
+    public static Map<Integer, UrlCheck> getAllUrlsLastChecks(List<Url> urls) throws SQLException {
+        Map<Integer, UrlCheck> allUrlsLastChecks = new HashMap<>();
+        for (Url url : urls) {
+            if (!getAllChecksForUrl(url.getId()).isEmpty()) {
+                int urlId = url.getId();
+                UrlCheck lastUrlCheck = getAllChecksForUrl(urlId).getFirst();
+                allUrlsLastChecks.put(urlId, lastUrlCheck);
+            }
+        }
+        return allUrlsLastChecks;
     }
 }

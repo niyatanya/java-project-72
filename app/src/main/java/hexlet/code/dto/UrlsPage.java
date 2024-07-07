@@ -3,6 +3,8 @@ package hexlet.code.dto;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import java.util.List;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -12,11 +14,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public final class UrlsPage extends BasePage {
     private List<Url> urls;
-    private List<UrlCheck> urlChecks;
-
-    public List<UrlCheck> getUrlChecksByUrlId(int urlId) {
-        return urlChecks.stream()
-                .filter(c -> c.getUrlId() == urlId)
-                .toList();
-    }
+    private Map<Integer, UrlCheck> allUrlsLastChecks;
 }

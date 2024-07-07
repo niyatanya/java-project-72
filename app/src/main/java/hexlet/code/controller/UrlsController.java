@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class UrlsController {
     public static void create(Context ctx) throws SQLException {
@@ -67,8 +68,8 @@ public class UrlsController {
 
     public static void index(Context ctx) throws SQLException {
         List<Url> urls = UrlRepository.getEntities();
-        List<UrlCheck> urlChecks = UrlChecksRepository.getAllChecks();
-        UrlsPage page = new UrlsPage(urls, urlChecks);
+        Map<Integer, UrlCheck> allUrlsLastChecks = UrlChecksRepository.getAllUrlsLastChecks(urls);
+        UrlsPage page = new UrlsPage(urls, allUrlsLastChecks);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         page.setAlertType(ctx.consumeSessionAttribute("alertType"));
         ctx.render("urls/index.jte", model("page", page));

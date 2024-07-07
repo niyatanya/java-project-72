@@ -30,14 +30,14 @@ content = @`
                             <a href="/urls/${url.getId()}">${url.getName()}</a>
                         </td>
                         <td>
-                            @if(page.getUrlChecksByUrlId(url.getId()) != null && !page.getUrlChecksByUrlId(url.getId()).isEmpty())
-                                ${page.getUrlChecksByUrlId(url.getId()).getFirst().getCreatedAt()
+                            @if(page.getAllUrlsLastChecks() != null && page.getAllUrlsLastChecks().containsKey(url.getId()))
+                                ${page.getAllUrlsLastChecks().get(url.getId()).getCreatedAt()
                             .toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm"))}
                             @endif
                         </td>
                         <td>
-                            @if(page.getUrlChecksByUrlId(url.getId()) != null && !page.getUrlChecksByUrlId(url.getId()).isEmpty())
-                                ${String.valueOf(page.getUrlChecksByUrlId(url.getId()).getFirst().getStatusCode())}
+                            @if(page.getAllUrlsLastChecks() != null && page.getAllUrlsLastChecks().containsKey(url.getId()))
+                                ${String.valueOf(page.getAllUrlsLastChecks().get(url.getId()).getStatusCode())}
                             @endif
                         </td>
                     </tr>
