@@ -125,10 +125,10 @@ public class AppTest {
             var response = client.post(NamedRoutes.checkUrlPath(String.valueOf(mockUrl.getId())));
             assertThat(response.code()).isEqualTo(200);
 
-            List<UrlCheck> urlChecks = UrlChecksRepository.getEntities(mockUrl.getId());
+            List<UrlCheck> urlChecks = UrlChecksRepository.getAllChecksForUrl(mockUrl.getId());
             assertThat(urlChecks.size()).isEqualTo(1);
 
-            UrlCheck lastUrlCheck = UrlChecksRepository.getEntities(mockUrl.getId()).getFirst();
+            UrlCheck lastUrlCheck = UrlChecksRepository.getAllChecksForUrl(mockUrl.getId()).getFirst();
             assertThat(lastUrlCheck.getUrlId()).isEqualTo(1);
             assertThat(lastUrlCheck.getStatusCode()).isEqualTo(200);
             assertThat(lastUrlCheck.getCreatedAt()).isToday();

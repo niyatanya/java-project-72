@@ -38,7 +38,7 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
-    public static List<UrlCheck> getEntities(int urlId) throws SQLException {
+    public static List<UrlCheck> getAllChecksForUrl(int urlId) throws SQLException {
         String sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
@@ -53,7 +53,7 @@ public class UrlChecksRepository extends BaseRepository {
         }
     }
 
-    public static List<UrlCheck> getEntities() throws SQLException {
+    public static List<UrlCheck> getAllChecks() throws SQLException {
         String sql = "SELECT * FROM url_checks ORDER BY id DESC";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {

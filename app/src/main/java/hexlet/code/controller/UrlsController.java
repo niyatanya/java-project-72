@@ -56,7 +56,7 @@ public class UrlsController {
         int id = ctx.pathParamAsClass("id", Integer.class).get();
         Url url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Page not found"));
-        List<UrlCheck> urlChecks = UrlChecksRepository.getEntities(id);
+        List<UrlCheck> urlChecks = UrlChecksRepository.getAllChecksForUrl(id);
 
         UrlPage page = new UrlPage(url);
         page.setUrlChecks(urlChecks);
@@ -67,7 +67,7 @@ public class UrlsController {
 
     public static void index(Context ctx) throws SQLException {
         List<Url> urls = UrlRepository.getEntities();
-        List<UrlCheck> urlChecks = UrlChecksRepository.getEntities();
+        List<UrlCheck> urlChecks = UrlChecksRepository.getAllChecks();
         UrlsPage page = new UrlsPage(urls, urlChecks);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         page.setAlertType(ctx.consumeSessionAttribute("alertType"));
@@ -89,10 +89,7 @@ public class UrlsController {
 
             Document document = Jsoup.parse(responseHTMLBody);
 
-            String title = document.title();
-            if (!title.equals("")) {
-                urlCheck.setTitle(title);
-            }
+            urlCheck.setTitle(document.title());
 
             Element h1 = document.select("h1").first();
             if (h1 != null) {
