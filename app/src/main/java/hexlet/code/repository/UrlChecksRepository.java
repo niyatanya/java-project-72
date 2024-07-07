@@ -2,6 +2,7 @@ package hexlet.code.repository;
 
 import hexlet.code.model.UrlCheck;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -46,15 +47,7 @@ public class UrlChecksRepository extends BaseRepository {
 
             List<UrlCheck> result = new ArrayList<>();
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                int statusCode = resultSet.getInt("status_code");
-                Timestamp createdAt = resultSet.getTimestamp("created_at");
-                String title = resultSet.getString("title");
-                String h1 = resultSet.getString("h1");
-                String description = resultSet.getString("description");
-
-                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
-                result.add(urlCheck);
+                result.add(getUrlCheckFromResultSet(resultSet));
             }
             return result;
         }
@@ -68,16 +61,7 @@ public class UrlChecksRepository extends BaseRepository {
 
             List<UrlCheck> result = new ArrayList<>();
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                int urlId = resultSet.getInt("url_id");
-                int statusCode = resultSet.getInt("status_code");
-                Timestamp createdAt = resultSet.getTimestamp("created_at");
-                String title = resultSet.getString("title");
-                String h1 = resultSet.getString("h1");
-                String description = resultSet.getString("description");
-
-                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
-                result.add(urlCheck);
+                result.add(getUrlCheckFromResultSet(resultSet));
             }
             return result;
         }
@@ -91,17 +75,21 @@ public class UrlChecksRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
 
             if (resultSet.next()) {
-                int urlId = resultSet.getInt("url_id");
-                int statusCode = resultSet.getInt("status_code");
-                Timestamp createdAt = resultSet.getTimestamp("created_at");
-                String title = resultSet.getString("title");
-                String h1 = resultSet.getString("h1");
-                String description = resultSet.getString("description");
-
-                UrlCheck urlCheck = new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
-                return Optional.of(urlCheck);
+                return Optional.of(getUrlCheckFromResultSet(resultSet));
             }
         }
         return Optional.empty();
+    }
+
+    public static UrlCheck getUrlCheckFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("id");
+        int urlId = resultSet.getInt("url_id");
+        int statusCode = resultSet.getInt("status_code");
+        Timestamp createdAt = resultSet.getTimestamp("created_at");
+        String title = resultSet.getString("title");
+        String h1 = resultSet.getString("h1");
+        String description = resultSet.getString("description");
+
+        return new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
     }
 }
