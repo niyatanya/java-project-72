@@ -79,30 +79,19 @@ public class UrlsController {
         int urlId = ctx.pathParamAsClass("id", Integer.class).get();
         Url url = UrlRepository.find(urlId)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
-
         try {
             HttpResponse<String> response = Unirest.get(url.getName()).asString();
             int statusCode = response.getStatus();
             String responseHTMLBody = response.getBody();
             Unirest.shutDown();
-
             UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
 
             Document document = Jsoup.parse(responseHTMLBody);
-
             urlCheck.setTitle(document.title());
-
             Element h1 = document.select("h1").first();
-            if (h1 != null) {
-                String h1Text = h1.text();
-                urlCheck.setH1(h1Text);
-            }
-
+            urlCheck.setH1(h1 == null ? null : h1.text());
             Element content = document.select("meta[name=description]").first();
-            if (content != null) {
-                String contentText = content.attr("content");
-                urlCheck.setDescription(contentText);
-            }
+            urlCheck.setDescription(content == null ? null : content.attr("content"));
             UrlChecksRepository.save(urlCheck);
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");
