@@ -67,15 +67,21 @@ public class UrlChecksRepository extends BaseRepository {
         return new UrlCheck(id, statusCode, title, h1, description, urlId, createdAt);
     }
 
-    public static Map<Integer, UrlCheck> getAllUrlsLastChecks(List<Url> urls) throws SQLException {
-        Map<Integer, UrlCheck> allUrlsLastChecks = new HashMap<>();
-        for (Url url : urls) {
-            if (!getAllChecksForUrl(url.getId()).isEmpty()) {
-                int urlId = url.getId();
-                UrlCheck lastUrlCheck = getAllChecksForUrl(urlId).getFirst();
-                allUrlsLastChecks.put(urlId, lastUrlCheck);
+    public static Map<Integer, UrlCheck> getAllUrlsLastChecks() throws SQLException {
+        String sql = "SELECT DISTINCT ON (url_id, id) * FROM url_checks ORDER BY url_id, id";
+
+        Map<Integer, UrlCheck> result = new HashMap<>();
+
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                int urlId = resultSet.getInt("url_id");
+                UrlCheck urlCheck = getUrlCheckFromResultSet(resultSet);
+                result.put(urlId, urlCheck);
             }
         }
-        return allUrlsLastChecks;
+        return result;
     }
 }
