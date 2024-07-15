@@ -79,28 +79,33 @@ public class UrlsController {
         int urlId = ctx.pathParamAsClass("id", Integer.class).get();
         Url url = UrlRepository.find(urlId)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
+        HttpResponse<String> response;
         try {
-            HttpResponse<String> response = Unirest.get(url.getName()).asString();
-            int statusCode = response.getStatus();
-            String responseHTMLBody = response.getBody();
+            response = Unirest.get(url.getName()).asString();
             Unirest.shutDown();
-            UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
-
-            Document document = Jsoup.parse(responseHTMLBody);
-            urlCheck.setTitle(document.title());
-            Element h1 = document.select("h1").first();
-            urlCheck.setH1(h1 == null ? null : h1.text());
-            Element content = document.select("meta[name=description]").first();
-            urlCheck.setDescription(content == null ? null : content.attr("content"));
-            UrlChecksRepository.save(urlCheck);
-
-            ctx.sessionAttribute("flash", "Страница успешно проверена");
-            ctx.sessionAttribute("alertType", "success");
-            ctx.redirect(NamedRoutes.urlPath(String.valueOf(urlId)));
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Invalid URL");
             ctx.sessionAttribute("alertType", "danger");
             ctx.redirect(NamedRoutes.urlPath(String.valueOf(urlId)));
+            return;
         }
+
+        int statusCode = response.getStatus();
+        String responseHTMLBody = response.getBody();
+
+        UrlCheck urlCheck = new UrlCheck(urlId, statusCode);
+
+        Document document = Jsoup.parse(responseHTMLBody);
+        urlCheck.setTitle(document.title());
+        Element h1 = document.select("h1").first();
+        urlCheck.setH1(h1 == null ? null : h1.text());
+        Element content = document.select("meta[name=description]").first();
+        urlCheck.setDescription(content == null ? null : content.attr("content"));
+        UrlChecksRepository.save(urlCheck);
+
+        ctx.sessionAttribute("flash", "Страница успешно проверена");
+        ctx.sessionAttribute("alertType", "success");
+        ctx.redirect(NamedRoutes.urlPath(String.valueOf(urlId)));
     }
 }
